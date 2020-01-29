@@ -52,6 +52,18 @@ class Nifcloud
         return true;
     }
 
+    public function createServers($zone, $servers)
+    {
+        $res = false;
+        foreach ($servers as $srvName => $conf) {
+            $res = $this->createServer($zone, $srvName, $conf);
+            if (!$res) {
+                break;
+            }
+        }
+        return $res;
+    }
+
     public function createServer($zone, $srvName, $conf)
     {
         $nic = array();
