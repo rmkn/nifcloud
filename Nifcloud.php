@@ -157,16 +157,30 @@ class Nifcloud
             $this->disp("{$fwName} を作成しました");
         }
         if (!empty($rules)) {
-            $this->disp("{$fwName} にルールを追加します");
-            // ルール設定
-            $res = $fw->setRules($rules);
-            //var_dump('set rule', $res);
-            if ($res === false) {
-                $this->disp($fw->getLastErrorMsg());
-                return false;
-            }
-            $this->disp("{$fwName} にルールを追加しました");
+            return $this->setFwRules($fw);
         }
+        return true;
+    }
+
+    public function setFirewallRules($zone, $fwName, $rules)
+    {
+        $fw = new Nifcloud_Firewall($this->ak, $this->sk, $zone, $fwName);
+        if ($fw->exists()) {
+            return $this->setFwRules($fw);
+        }
+    }
+
+    private function setFwRules($fw)
+    {
+        $this->disp("{$fwName} にルールを追加します");
+        // ルール設定
+        $res = $fw->setRules($rules);
+        //var_dump('set rule', $res);
+        if ($res === false) {
+            $this->disp($fw->getLastErrorMsg());
+            return false;
+        }
+        $this->disp("{$fwName} にルールを追加しました");
         return true;
     }
 
