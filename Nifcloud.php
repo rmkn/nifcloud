@@ -84,7 +84,7 @@ class Nifcloud
         }
     
         $param = array(
-            'ImageId' => isset($conf['imageid']) ? $conf['imageid'] : 183, //CentOS 7.6
+            'ImageId' => isset($conf['imageid']) ? $conf['imageid'] : 201, //CentOS 7.7
             'KeyName' => $conf['keyname'],
             'SecurityGroup.1' => $conf['firewall'],
             'InstanceType' => $conf['type'],
