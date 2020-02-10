@@ -14,6 +14,11 @@ class Nifcloud_Firewall extends Nifcloud_API
         $this->getInfo();
     }
 
+    public function getName()
+    {
+        return $this->name;
+    }
+
     public function exists()
     {
         return isset($this->res['securityGroupInfo']['item']['groupName']);
