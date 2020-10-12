@@ -185,6 +185,29 @@ class Nifcloud
         return true;
     }
 
+    public function deleteFirewallRules($zone, $fwName, $rules)
+    {
+        $fw = new Nifcloud_Firewall($this->ak, $this->sk, $zone, $fwName);
+        if ($fw->exists()) {
+            return $this->deleteFwRules($fw, $rules);
+        }
+    }
+
+    private function deleteFwRules($fw, $rules)
+    {
+        $fwName = $fw->getName();
+        $this->disp("{$fwName} からルールを削除します");
+        // ルール削除
+        $res = $fw->deleteRules($rules);
+        //var_dump('set rule', $res);
+        if ($res === false) {
+            $this->disp($fw->getLastErrorMsg());
+            return false;
+        }
+        $this->disp("{$fwName} からルールを削除しました");
+        return true;
+    }
+
     public function getFirewallLog($zone, $fwName, $date = null, $start = null, $end =null)
     {
         $fw = new Nifcloud_Firewall($this->ak, $this->sk, $zone, $fwName);

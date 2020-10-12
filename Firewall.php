@@ -61,6 +61,12 @@ class Nifcloud_Firewall extends Nifcloud_API
 
     private function ruleExists($rule)
     {
+        if (!isset($rule['IpProtocol'])
+            || !isset($rule['InOut'])
+            || !isset($rule['Description'])
+        ) {
+            return false;
+        }
         if (!isset($this->res['securityGroupInfo']['item']['ipPermissions']['item'])) {
             return false;
         }
@@ -69,7 +75,9 @@ class Nifcloud_Firewall extends Nifcloud_API
                 && $item['inOut'] === $rule['InOut']
                 && $item['description'] === $rule['Description']
             ) {
-                if (isset($item['fromPort']) && isset($item['toPort'])) {
+                if (isset($item['fromPort']) && isset($item['toPort'])
+                    && isset($rule['FromPort']) && isset($rule['ToPort'])
+                ) {
                     if ($item['fromPort'] === strval($rule['FromPort'])
                         && $item['toPort'] === strval($rule['ToPort'])
                     ) {
@@ -102,6 +110,28 @@ class Nifcloud_Firewall extends Nifcloud_API
         $url   = '';
         $param = array(
             'Action'        => 'AuthorizeSecurityGroupIngress',
+            'GroupName'     => $this->name,
+            'IpPermissions' => $buf,
+        );
+
+        $this->call($url, $param);
+        return !$this->isError();
+    }
+
+    public function deleteRules($rules)
+    {
+        $buf = array();
+        foreach ($rules as $rule) {
+            if ($this->ruleExists($rule)) {
+                $buf[] = $rule;
+            }
+        }
+        if (empty($buf)) {
+            return true;
+        }
+        $url   = '';
+        $param = array(
+            'Action'        => 'RevokeSecurityGroupIngress',
             'GroupName'     => $this->name,
             'IpPermissions' => $buf,
         );
