@@ -22,13 +22,13 @@ class Nifcloud_RdbParam extends Nifcloud_RdbAPI
         return !$this->isError();
     }
 
-    public function create($family, $name, $desc = '')
+    public function create($family, $desc = '')
     {
         $url   = '';
         $param = array(
             'Action'                 => 'CreateDBParameterGroup',
             'DBParameterGroupFamily' => $family,
-            'DBParameterGroupName'   => $name,
+            'DBParameterGroupName'   => $this->name,
             'Description'            => $desc,
         );
 
@@ -36,12 +36,12 @@ class Nifcloud_RdbParam extends Nifcloud_RdbAPI
         return !$this->isError();
     }
 
-    public function modify($name, $params)
+    public function modify($params)
     {
         $url   = '';
         $param = array(
             'Action'                 => 'ModifyDBParameterGroup',
-            'DBParameterGroupName'   => $name,
+            'DBParameterGroupName'   => $this->name,
         );
         $idx = 0;
         foreach ($params as $v) {
