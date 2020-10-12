@@ -1,36 +1,10 @@
 <?php
 // vim: set et ts=4 sw=4 sts=4:
 
-require_once 'Nifcloud/API.php';
+require_once 'Nifcloud/RdbAPI.php';
 
-class Nifcloud_Rdb extends Nifcloud_API
+class Nifcloud_Rdb extends Nifcloud_RdbAPI
 {
-    protected $name = null;
-
-    public function __construct($accessKey, $secretKey, $zone, $name)
-    {
-        parent::__construct($accessKey, $secretKey, $zone);
-        $this->name = $name;
-        //$this->setVersion(4);
-    }
-
-    protected function getEndpoint()
-    {
-        $endpoints = array(
-            'east-1' => 'aws://jp-east-1.rdb.api.nifcloud.com/',
-            'east-2' => 'aws://jp-east-2.rdb.api.nifcloud.com/',
-            'east-3' => 'aws://jp-east-3.rdb.api.nifcloud.com/',
-            'east-4' => 'aws://jp-east-4.rdb.api.nifcloud.com/',
-            'west-1' => 'aws://jp-west-1.rdb.api.nifcloud.com/',
-        );
-        return isset($endpoints[$this->region]) ? $endpoints[$this->region] : null;
-    }
-
-    public function getRes()
-    {
-        return $this->res;
-    }
-
     public function getLog($date = null, $start = null, $end =null)
     {
         $url   = '';
@@ -55,4 +29,44 @@ class Nifcloud_Rdb extends Nifcloud_API
         $this->call($url, $param);
         return !$this->isError();
     }
+
+    public function exists()
+    {
+        return isset($this->res['DescribeDBInstancesResult']['DBInstances']['DBInstance']['DBInstanceIdentifier']);
+    }
+
+    public function getStatus($reload = false)
+    {
+        if ($reload) {
+            $this->getInfo();
+        }
+        return isset($this->res['DescribeDBInstancesResult']['DBInstances']['DBInstance']['DBInstanceStatus'])
+            ? $this->res['DescribeDBInstancesResult']['DBInstances']['DBInstance']['DBInstanceStatus']
+            : null;
+    }
+
+    public function getInfo()
+    {
+        $url   = '';
+        $param = array(
+            'Action'               => 'DescribeDBInstances',
+            'DBInstanceIdentifier' => $this->name,
+        );
+
+        $this->call($url, $param);
+        return !$this->isError();
+    }
+
+    public function create($params)
+    {
+        $url   = '';
+        $param = array(
+            'Action'               => 'CreateDBInstance',
+            'DBInstanceIdentifier' => $this->name,
+        ) + $params;
+
+        $this->call($url, $param);
+        return !$this->isError();
+    }
+
 }
