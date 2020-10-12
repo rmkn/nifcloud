@@ -39,10 +39,13 @@ class Nifcloud_RdbFirewall extends Nifcloud_RdbAPI
     protected function isProcessing()
     {
         $res = $this->getInfo($this->name);
-
         $cnt = 0;
-        if (isset($this->res['DescribeDBSecurityGroupsResult']['DBSecurityGroups']['DBSecurityGroup']['EC2SecurityGroups'])) {
-            foreach ($this->res['DescribeDBSecurityGroupsResult']['DBSecurityGroups']['DBSecurityGroup']['EC2SecurityGroups'] as $r) {
+        if (isset($this->res['DescribeDBSecurityGroupsResult']['DBSecurityGroups']['DBSecurityGroup']['EC2SecurityGroups']['EC2SecurityGroup'])) {
+            $secgroups = $this->res['DescribeDBSecurityGroupsResult']['DBSecurityGroups']['DBSecurityGroup']['EC2SecurityGroups']['EC2SecurityGroup'];
+            if (isset($secgroups['EC2SecurityGroupName'])) {
+                $secgroups = array($secgroups);
+            }
+            foreach ($secgroups as $r) {
                 if (isset($r['Status'])) {
                     switch ($r['Status']) {
                     case 'authorizing':
@@ -52,8 +55,12 @@ class Nifcloud_RdbFirewall extends Nifcloud_RdbAPI
                 }
             }
         }
-        if (isset($this->res['DescribeDBSecurityGroupsResult']['DBSecurityGroups']['DBSecurityGroup']['IPRanges'])) {
-            foreach ($this->res['DescribeDBSecurityGroupsResult']['DBSecurityGroups']['DBSecurityGroup']['IPRanges'] as $r) {
+        if (isset($this->res['DescribeDBSecurityGroupsResult']['DBSecurityGroups']['DBSecurityGroup']['IPRanges']['IPRange'])) {
+            $ipranges = $this->res['DescribeDBSecurityGroupsResult']['DBSecurityGroups']['DBSecurityGroup']['IPRanges']['IPRange'];
+            if (isset($ipranges['CIDRIP'])) {
+                $ipranges = array($ipranges);
+            }
+            foreach ($ipranges as $r) {
                 if (isset($r['Status'])) {
                     switch ($r['Status']) {
                     case 'authorizing':
@@ -75,6 +82,7 @@ class Nifcloud_RdbFirewall extends Nifcloud_RdbAPI
         );
         $rc = true;
         foreach ($rules as $rule) {
+var_dump($rule);
             if (isset($rule['CIDRIP'])) {
                 $param = $paramBase + array('CIDRIP' => $rule['CIDRIP']);
             } elseif (isset($rule['EC2SecurityGroupName'])) {
