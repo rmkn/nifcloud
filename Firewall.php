@@ -81,6 +81,11 @@ class Nifcloud_Firewall extends Nifcloud_API
                     if ($item['fromPort'] === strval($rule['FromPort'])
                         && $item['toPort'] === strval($rule['ToPort'])
                     ) {
+                        if (isset($item['groups']['item']['groupName'])) {  // TODO: IPが同じときもチェックが必要
+                            if ($item['groups']['item']['groupName'] !== $rule['Groups'][0]['GroupName']) {
+                                 return false;
+                            }
+                        }
                         return true;
                     } else {
                         return false;

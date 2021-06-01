@@ -29,6 +29,27 @@ class Nifcloud_Server extends Nifcloud_API
             : null;
     }
 
+    public function getType()
+    {
+        return isset($this->res['reservationSet']['item']['instancesSet']['item']['instanceType'])
+            ? $this->res['reservationSet']['item']['instancesSet']['item']['instanceType']
+            : null;
+    }
+
+    public function getAccountingType()
+    {
+        return isset($this->res['reservationSet']['item']['instancesSet']['item']['accountingType'])
+            ? $this->res['reservationSet']['item']['instancesSet']['item']['accountingType']
+            : null;
+    }
+
+    public function getNextAccountingType()
+    {
+        return isset($this->res['reservationSet']['item']['instancesSet']['item']['nextMonthAccountingType'])
+            ? $this->res['reservationSet']['item']['instancesSet']['item']['nextMonthAccountingType']
+            : null;
+    }
+
     public function getInfo()
     {
         $url   = '';
@@ -76,5 +97,17 @@ class Nifcloud_Server extends Nifcloud_API
         $this->call($url, $param);
         return !$this->isError();
     } 
+
+    public function change($params)
+    {
+        $url   = '';
+        $param = array(
+            'Action'     => 'ModifyInstanceAttribute',
+            'InstanceId' => $this->name,
+        ) + $params;
+
+        $this->call($url, $param);
+        return !$this->isError();
+    }
 
 }
